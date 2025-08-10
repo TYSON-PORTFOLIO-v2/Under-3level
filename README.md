@@ -1,1 +1,411 @@
-# Under-3level
+html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prediction Hack</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #0c0f1d, #161b33);
+  overflow: hidden;
+  color: white;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  max-width: 800px;
+  width: 95%;
+  padding: 20px;
+}
+
+#bg-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  border: none;
+  opacity: 0.1;
+}
+
+.floating-icon {
+  position: fixed;
+  bottom: 60px;
+  right: 15px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #00bcd4, #0097a7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 188, 212, 0.6);
+  transition: all 0.3s;
+  font-size: 24px;
+  color: white;
+  z-index: 1000;
+}
+
+.floating-icon:hover {
+  transform: scale(1.1) rotate(10deg);
+  box-shadow: 0 8px 20px rgba(0, 188, 212, 0.8);
+}
+
+.dialog-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 320px;
+  background: linear-gradient(135deg, #1a237e, #3f51b5);
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+  color: white;
+  text-align: center;
+  display: none;
+  opacity: 0;
+  transition: all 0.4s;
+  z-index: 2000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.dialog-box.show {
+  display: block;
+  opacity: 1;
+}
+
+.dialog-box h1 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #ffeb3b;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.dialog-box h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #4fc3f7;
+}
+
+.prediction {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 12px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.timer-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50px;
+  padding: 10px;
+  margin: 15px auto;
+  width: 120px;
+}
+
+.timer {
+  font-size: 28px;
+  font-weight: bold;
+  color: #76ff03;
+  text-shadow: 0 0 10px rgba(118, 255, 3, 0.7);
+}
+
+.result {
+  font-size: 28px;
+  font-weight: bold;
+  margin-top: 15px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s;
+  opacity: 0;
+}
+
+.result.show {
+  opacity: 1;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.big {
+  color: #ff9800;
+  text-shadow: 0 0 15px rgba(255, 152, 0, 0.8);
+}
+
+.small {
+  color: #03a9f4;
+  text-shadow: 0 0 15px rgba(3, 169, 244, 0.8);
+}
+
+.telegram-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff4081, #d81b60);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 20px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4);
+}
+
+.telegram-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(244, 67, 54, 0.6);
+}
+
+.telegram-btn i {
+  margin-right: 8px;
+}
+
+.close {
+  margin-top: 15px;
+  padding: 10px 25px;
+  border: none;
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  color: white;
+  font-size: 14px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+}
+
+.close:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(211, 47, 47, 0.4);
+}
+
+.footer {
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 1000;
+}
+
+.footer:hover {
+  color: #00bcd4;
+  text-decoration: underline;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1500;
+  display: none;
+}
+
+.overlay.show {
+  display: block;
+}
+
+.pulse-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(0, 188, 212, 0.4);
+  animation: pulseRing 2s infinite;
+  z-index: -1;
+}
+
+@keyframes pulseRing {
+  0% { transform: scale(0.8); opacity: 1; }
+  70% { transform: scale(1.5); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@media (max-width: 480px) {
+  .dialog-box {
+    width: 90%;
+    padding: 20px;
+  }
+  
+  .floating-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay"></div>
+<iframe id="bg-frame" src="https://www.91appi.com/#/register?invitationCode=52425794963"></iframe>
+
+<div class="floating-icon" id="open">
+  <div class="pulse-effect"></div>
+  🎮
+</div>
+
+<div class="dialog-box" id="dialogBox">
+  <h1>TYSON UNDER 2 LEVEL FREE HACK</h1>
+  <h2>DM FOR PAID HACK</h2>
+  <h3>@TYSON_OWNER</h3>
+  <h4>TG ~ TYSON_OK_WIN_HACK</h4>
+      
+  <div class="prediction">
+    <span>📅 Period:</span>
+    <span id="period">0000000000</span>
+  </div>
+  
+  <div class="timer-container">
+    <div class="timer" id="timer">00:00</div>
+  </div>
+  
+  <div id="resText" class="result"></div>
+  
+  <a href="https://t.me/+pGMNTkg_28thODZl" target="_blank" class="telegram-btn">
+    <i class="fab fa-telegram"></i> Join Telegram
+  </a>
+  
+  <button class="close" id="close">Close</button>
+</div>
+
+<p class="footer" id="madeBy">Made by @TYSON_OWNER</p>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Elements
+  const openBtn = document.getElementById("open");
+  const dialogBox = document.getElementById("dialogBox");
+  const timerText = document.getElementById("timer");
+  const resText = document.getElementById("resText");
+  const periodNum = document.getElementById("period");
+  const closeBtn = document.getElementById("close");
+  const footer = document.getElementById("madeBy");
+  const overlay = document.getElementById("overlay");
+  
+  // Variables
+  let bigSmall = "BIG";
+  let counter = 59;
+  let drag = false;
+  let offsetX, offsetY;
+  
+  // Open dialog
+  openBtn.onclick = () => {
+    dialogBox.classList.add("show");
+    overlay.classList.add("show");
+  };
+  
+  // Close dialog
+  closeBtn.onclick = () => {
+    dialogBox.classList.remove("show");
+    overlay.classList.remove("show");
+  };
+  
+  // Close dialog when clicking on overlay
+  overlay.onclick = () => {
+    dialogBox.classList.remove("show");
+    overlay.classList.remove("show");
+  };
+  
+  // Made by link
+  footer.onclick = () => {
+    window.open("https://t.me/TYSON_OK_WIN_HACK", "_blank");
+  };
+  
+  // Update prediction and timer
+  function updatePrediction() {
+    const now = new Date();
+    const y = now.getUTCFullYear();
+    const m = String(now.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(now.getUTCDate()).padStart(2, '0');
+    const h = now.getUTCHours();
+    const min = now.getUTCMinutes();
+    const total = h * 120 + min;
+    const period = `${y}${m}${d}1000${10001 + total}`;
+    
+    periodNum.innerText = period;
+    
+    if (counter === 59) {
+      bigSmall = Math.random() < 0.5 ? "BIG" : "SMALL";
+      resText.classList.remove("show");
+      
+      setTimeout(() => {
+        resText.classList.add("show");
+        resText.innerHTML = `<span class="${bigSmall === 'BIG' ? 'big' : 'small'}">${bigSmall}</span>`;
+      }, 100);
+    }
+    
+    counter--;
+    if (counter < 0) counter = 59;
+    
+    timerText.innerText = `00:${String(counter).padStart(2, '0')}`;
+  }
+  
+  // Initialize and update every second
+  setInterval(updatePrediction, 1000);
+  updatePrediction();
+  
+  // Draggable functionality for floating button
+  openBtn.addEventListener("mousedown", function(e) {
+    drag = true;
+    offsetX = e.clientX - openBtn.getBoundingClientRect().left;
+    offsetY = e.clientY - openBtn.getBoundingClientRect().top;
+    openBtn.style.transition = "none";
+  });
+  
+  document.addEventListener("mousemove", function(e) {
+    if (drag) {
+      openBtn.style.left = `${e.clientX - offsetX}px`;
+      openBtn.style.top = `${e.clientY - offsetY}px`;
+      openBtn.style.right = "unset";
+      openBtn.style.bottom = "unset";
+    }
+  });
+  
+  document.addEventListener("mouseup", function() {
+    drag = false;
+    openBtn.style.transition = "all 0.3s";
+  });
+  
+  // Add Font Awesome for Telegram icon
+  const fontAwesome = document.createElement('link');
+  fontAwesome.rel = 'stylesheet';
+  fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+  document.head.appendChild(fontAwesome);
+});
+</script>
+</body>
+</html>
